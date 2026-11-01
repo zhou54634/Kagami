@@ -1820,6 +1820,10 @@ int handle_kasumi(output::Context& destination, Arguments args) {
         } else if (sub == "statfs-spoof") {
             ok = kasumi::set_statfs_spoof(on);
         } else {
+            if (value != "off" && value != "on") {
+                output::err(destination, "usage: kagamid kasumi selinux-fix on|off\n");
+                return 1;
+            }
             ok = kasumi::set_selinux_guard(on);
         }
         if (!ok) {

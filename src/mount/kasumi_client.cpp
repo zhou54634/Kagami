@@ -446,6 +446,17 @@ bool set_statfs_spoof(bool enable) {
 }
 
 bool set_selinux_guard(bool enable) {
+    const auto caps = feature_capabilities();
+    if (!caps.ok) {
+        errno = caps.last_errno;
+        return false;
+    }
+    if (!(caps.bitmask & KSM_FEATURE_SELINUX_FIX)) {
+        if (!enable)
+            return true;
+        errno = EOPNOTSUPP;
+        return false;
+    }
     int value = enable ? 1 : 0;
     return execute(KSM_IOC_SELINUX_FIX, &value) == 0;
 }

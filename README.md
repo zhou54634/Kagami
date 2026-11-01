@@ -98,6 +98,17 @@ selector are removed. Existing `mount_hide_mode` fields are ignored when
 loading and removed by the next `config merge-json`; new writes to that field
 are rejected. Update the controller and the Kasumi LKM together.
 
+SELinux Guard (`enable_selinux_fix`, default false) now controls bounded
+timing compensation for proc `attr/current` writes in the Kasumi SPOOF scope.
+The updated LKM pads inputs that skip context parsing only after the original
+write returns `EINVAL`; it no longer filters built-in context markers or
+fabricates SELinux query results. Its default budget is 1000 ns (1 microsecond), capped
+at 2000 ns. `kagamid kasumi selinux-fix on|off` changes the runtime switch,
+and `kagamid api hooks` reports proxy availability, budget, placement, and
+spin count. Enabling requires feature bit 10; an unavailable guard can remain
+disabled without blocking other settings. Install the updated Kasumi LKM
+to use the timing compensation.
+
 The C++ client includes the self-contained `include/kagami/kasumi_uapi.h`
 directly, synchronized from Kasumi's `src/include/kasumi_uapi.h`.
 `kagamid kasumi conflicts` reads the API 18 diagnostic queue;
